@@ -6,8 +6,6 @@ const app = express()
 
 
 
-
-
 // ルーティング
 const router = express.Router()
 
