@@ -28,7 +28,31 @@
 </template>
 
 <script>
-export default {}
+import axios from 'axios'
+export default {
+  created () {
+    this.testAPI()
+  },
+
+  methods: {
+    async testAPI () {
+      // const res = await this.$axios.$get('/api/test')
+      const res = await axios.get('/api/test')
+      console.log(res)
+
+      // const xhr = new XMLHttpRequest()
+      // xhr.open('GET', '/api/test.js')
+      // console.log(xhr)
+      // xhr.onreadystatechange = function(){
+      //   if(xhr.readyState == 4 && xhr.status == 200){
+      //     alert(xhr.responseText);
+      //   }
+      // };
+      // xhr.send(null);
+
+    }
+  }
+}
 </script>
 
 <style>
