@@ -4,6 +4,9 @@ require('dotenv').config()
 const express = require('express')
 const app = express()
 
+app.use(express.json())
+app.use(express.urlencoded({ extended: true }));
+
 // Firebase RealtimeDatabaseに接続
 const admin = require('firebase-admin');
 const serviceAccount = {
@@ -26,44 +29,38 @@ if(!admin.apps.length) {
   });
 }
 
-const usersRef = admin.database().ref("users");
-  // const channelsRef = admin.database().ref('channels');
-
-  const getData = (ref) => {
-    return new Promise((resolve, reject) => {
-      const onDataCallback = snapshot => resolve(snapshot.val())
-      ref.on('value', onDataCallback)
-    });
-  }
+const notesRef = admin.firestore().collection('notes')
 
 // ルーティング
 const router = express.Router()
 
-  router.get('/', (req, res) => {
-    res.json({
-      body: req.body,
-      query: req.query,
-      cookies: req.cookies,
-      test: 'api'
-    })
-  })
-
-  router.get('/test', (req, res) => {
-    res.json({
-      body: req.body,
-      query: req.query,
-      cookies: req.cookies,
-      test: 'test',
-      key1: process.env.KEY1
-    })
-  })
-
-  router.get('/test2', async(req, res) => {
+  // メモの取得
+  router.get('/note', async (req, res) => {
+    const querySnapshot = await notesRef.get()
+    let notes = new Array()
+    querySnapshot.forEach(function(doc) {
+      const note = Object.assign(doc.data(), {id: doc.id})
+      notes.push(note)
+    });
     res.header('Content-Type', 'application/json; charset=utf-8')
-    // res.send({value: "テスト２"});
-    const users = await getData(usersRef);
-    res.send(users);
-  });
+    res.send({notes: notes})
+  })
+
+  // メモの追加
+  router.post('/note/add', async (req, res) => {
+    const note = req.body.note
+    await notesRef.add(note)
+    res.header('Content-Type', 'application/json; charset=utf-8')
+    res.status(201).json({
+      result: 'ok' + ' ' + req.body.note
+    })
+  })
+
+  // メモの削除
+  router.delete('/note/delete/:id', async (req, res) => {
+    noteId = req.params.id
+    await notesRef.doc(noteId).delete()
+  })
 
 app.use('/api', router)
 

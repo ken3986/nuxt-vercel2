@@ -19,3 +19,15 @@
     </b-collapse>
   </b-navbar>
 </template>
+
+<script>
+export default {
+
+}
+</script>
+
+<style scoped>
+  .navbar {
+    z-index: 999;
+  }
+</style>
