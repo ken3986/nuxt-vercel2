@@ -58,7 +58,6 @@ export default {
     },
 
     deleteNote (note) {
-      console.log('postdelete')
       this.$store.dispatch('notes/deleteNote', note)
       // const index = this.notes.indexOf(note)
       // this.notes.splice(index, 1)

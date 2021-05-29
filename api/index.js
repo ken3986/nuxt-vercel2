@@ -35,31 +35,44 @@ const notesRef = admin.firestore().collection('notes')
 const router = express.Router()
 
   // メモの取得
-  router.get('/note', async (req, res) => {
-    const querySnapshot = await notesRef.get()
-    let notes = new Array()
-    querySnapshot.forEach(function(doc) {
-      const note = Object.assign(doc.data(), {id: doc.id})
-      notes.push(note)
-    });
-    res.header('Content-Type', 'application/json; charset=utf-8')
-    res.send({notes: notes})
+  router.get('/note', async (req, res, next) => {
+    try {
+      const querySnapshot = await notesRef.get()
+      let notes = new Array()
+      querySnapshot.forEach(function(doc) {
+        const note = Object.assign(doc.data(), {id: doc.id})
+        notes.push(note)
+      });
+      res.header('Content-Type', 'application/json; charset=utf-8')
+      res.send({notes: notes})
+    } catch (err) {
+      next(err)
+    }
   })
 
   // メモの追加
-  router.post('/note/add', async (req, res) => {
+  router.post('/note/add', async (req, res, next) => {
     const note = req.body.note
-    await notesRef.add(note)
-    res.header('Content-Type', 'application/json; charset=utf-8')
-    res.status(201).json({
-      result: 'ok' + ' ' + req.body.note
-    })
+    try {
+      await notesRef.add(note)
+      res.header('Content-Type', 'application/json; charset=utf-8')
+      res.status(201).json({
+        result: 'ok' + ' ' + req.body.note
+      })
+    } catch (err) {
+      next(err)
+    }
   })
 
   // メモの削除
-  router.delete('/note/delete/:id', async (req, res) => {
+  router.delete('/note/delete/:id', async (req, res, next) => {
     noteId = req.params.id
-    await notesRef.doc(noteId).delete()
+    try {
+      await notesRef.doc(noteId).delete()
+      res.sendStatus(200)
+    } catch (err) {
+      next(err)
+    }
   })
 
 app.use('/api', router)

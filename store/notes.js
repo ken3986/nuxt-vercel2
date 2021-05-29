@@ -24,6 +24,7 @@ export const mutations = {
   }
 }
 
+// メモの同期
 const fetchGetNotes = async () => {
   const result = await axios.get('/api/note')
   const notes = result.data.notes
@@ -31,11 +32,13 @@ const fetchGetNotes = async () => {
 }
 
 export const actions = {
+  // メモの取得
   async getNotes (context) {
     const notes = await fetchGetNotes()
     context.commit('fetch', notes)
   },
 
+  // メモの追加
   async addNote (context, note) {
     const result = await axios.post('/api/note/add',
       {
@@ -49,9 +52,13 @@ export const actions = {
     }
   },
 
+  // メモの削除
   async deleteNote (context, note) {
-    console.log(note)
     const result = await axios.delete('/api/note/delete' + `/${note.id}`)
-    context.commit('fetch', notes)
+
+    if(result.status == 200) {
+      const notes = await fetchGetNotes()
+      context.commit('fetch', notes)
+    }
   }
 }
